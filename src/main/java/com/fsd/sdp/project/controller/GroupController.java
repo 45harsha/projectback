@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/groups")
 public class GroupController {
@@ -19,12 +19,26 @@ public class GroupController {
     private GroupService groupService;
 
     @PostMapping("/create")
-    public ResponseEntity<?> createGroup(@RequestBody GroupRequest request) {
+    public ResponseEntity<?> createGroup(@RequestBody GroupRequest groupRequest) {
         try {
-            System.out.println("Creating group with name: " + request.getName() + ", creator: " + request.getCreatorUsername());
-            Group group = groupService.createGroup(request.getName(), request.getPassword(), request.getCreatorUsername());
-            System.out.println("Group created: " + group);
-            return ResponseEntity.ok(group);
+            if (groupRequest.getName() == null || groupRequest.getName().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Group name is required");
+            }
+            if (groupRequest.getPassword() == null || groupRequest.getPassword().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Group password is required");
+            }
+            if (groupRequest.getCreatorUsername() == null || groupRequest.getCreatorUsername().trim().isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Creator username is required");
+            }
+
+            System.out.println("Creating group with name: " + groupRequest.getName() + ", creator: " + groupRequest.getCreatorUsername());
+            Group createdGroup = groupService.createGroup(
+                    groupRequest.getName(),
+                    groupRequest.getPassword(),
+                    groupRequest.getCreatorUsername()
+            );
+            System.out.println("Group created: " + createdGroup);
+            return ResponseEntity.ok(createdGroup);
         } catch (Exception e) {
             System.err.println("Error creating group: " + e.getMessage());
             e.printStackTrace();
@@ -34,10 +48,10 @@ public class GroupController {
     }
 
     @PostMapping("/join/{groupId}")
-    public ResponseEntity<?> joinGroup(@PathVariable Long groupId, @RequestBody JoinGroupRequest request) {
+    public ResponseEntity<?> joinGroup(@PathVariable String groupId, @RequestBody JoinGroupRequest joinDetails) {
         try {
-            System.out.println("User " + request.getUsername() + " joining group ID: " + groupId);
-            Group group = groupService.joinGroup(groupId, request.getPassword(), request.getUsername());
+            System.out.println("User " + joinDetails.getUsername() + " joining group ID: " + groupId);
+            Group group = groupService.joinGroup(groupId, joinDetails.getPassword(), joinDetails.getUsername());
             System.out.println("User joined group: " + group);
             return ResponseEntity.ok(group);
         } catch (RuntimeException e) {
@@ -47,7 +61,7 @@ public class GroupController {
     }
 
     @PostMapping("/leave/{groupId}")
-    public ResponseEntity<?> leaveGroup(@PathVariable Long groupId, @RequestBody UsernameRequest request) {
+    public ResponseEntity<?> leaveGroup(@PathVariable String groupId, @RequestBody LeaveGroupRequest request) {
         try {
             System.out.println("User " + request.getUsername() + " leaving group ID: " + groupId);
             String result = groupService.leaveGroup(groupId, request.getUsername());
@@ -74,12 +88,12 @@ public class GroupController {
     }
 
     @PostMapping("/message/{groupId}")
-    public ResponseEntity<?> sendMessage(@PathVariable Long groupId, @RequestBody MessageRequest request) {
+    public ResponseEntity<?> sendMessage(@PathVariable String groupId, @RequestBody Message message) {
         try {
-            System.out.println("Sending message to group ID: " + groupId + " by " + request.getSenderUsername());
-            Message message = groupService.sendMessage(groupId, request.getSenderUsername(), request.getContent(), request.getType());
-            System.out.println("Message sent: " + message);
-            return ResponseEntity.ok(message);
+            System.out.println("Sending message to group ID: " + groupId + " by " + message.getSenderUsername());
+            Message savedMessage = groupService.sendMessage(groupId, message.getSenderUsername(), message.getContent(), message.getType());
+            System.out.println("Message sent: " + savedMessage);
+            return ResponseEntity.ok(savedMessage);
         } catch (RuntimeException e) {
             System.err.println("Error sending message: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -87,7 +101,7 @@ public class GroupController {
     }
 
     @GetMapping("/messages/{groupId}")
-    public ResponseEntity<?> getGroupMessages(@PathVariable Long groupId) {
+    public ResponseEntity<?> getGroupMessages(@PathVariable String groupId) {
         try {
             System.out.println("Fetching messages for groupId: " + groupId);
             List<Message> messages = groupService.getGroupMessages(groupId);
@@ -113,48 +127,104 @@ public class GroupController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching shared files: " + e.getMessage());
         }
     }
+
+    @GetMapping("/viewall")
+    public ResponseEntity<?> viewAllGroups() {
+        try {
+            System.out.println("Fetching all groups");
+            List<Group> groups = groupService.viewAllGroups();
+            System.out.println("Groups retrieved: " + groups);
+            return ResponseEntity.ok(groups);
+        } catch (Exception e) {
+            System.err.println("Error fetching all groups: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error fetching groups: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/admin/delete/{adminId}/{groupId}")
+    public ResponseEntity<?> deleteGroup(@PathVariable Long adminId, @PathVariable String groupId) {
+        try {
+            System.out.println("Admin " + adminId + " attempting to delete group ID: " + groupId);
+            String result = groupService.deleteGroup(adminId, groupId);
+            System.out.println("Delete group result: " + result);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            System.err.println("Error deleting group: " + e.getMessage());
+            if (e.getMessage().equals("Unauthorized: Only admins can delete groups")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            } else if (e.getMessage().equals("Group not found") || e.getMessage().equals("Admin not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("An error occurred while deleting the group");
+            }
+        }
+    }
 }
 
-// DTOs remain unchanged
+// DTO for create group request
 class GroupRequest {
     private String name;
     private String password;
     private String creatorUsername;
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getCreatorUsername() { return creatorUsername; }
-    public void setCreatorUsername(String creatorUsername) { this.creatorUsername = creatorUsername; }
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getCreatorUsername() {
+        return creatorUsername;
+    }
+
+    public void setCreatorUsername(String creatorUsername) {
+        this.creatorUsername = creatorUsername;
+    }
 }
 
+// DTO for join group request
 class JoinGroupRequest {
+    private String username;
     private String password;
-    private String username;
 
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
 
-class UsernameRequest {
+// DTO for leave group request
+class LeaveGroupRequest {
     private String username;
 
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-}
+    public String getUsername() {
+        return username;
+    }
 
-class MessageRequest {
-    private String senderUsername;
-    private String content;
-    private String type;
-
-    public String getSenderUsername() { return senderUsername; }
-    public void setSenderUsername(String senderUsername) { this.senderUsername = senderUsername; }
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
 }

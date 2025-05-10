@@ -9,10 +9,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column
     private String username;
-
+    @Column
     private String email;
-
+    @Column
     private String password;
 
     @Lob
@@ -20,15 +21,18 @@ public class User {
     private byte[] profilePicture;
 
     @Column(name = "profile_picture_type", nullable = true)
-    private String profilePictureType; // New field for MIME type
+    private String profilePictureType;
 
-    // Constructors
+    @Column(name = "is_admin", nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private boolean isAdmin = false;
+
     public User() {}
 
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.isAdmin = false;
     }
 
     public User(String username, String email, String password, byte[] profilePicture, String profilePictureType) {
@@ -37,9 +41,9 @@ public class User {
         this.password = password;
         this.profilePicture = profilePicture;
         this.profilePictureType = profilePictureType;
+        this.isAdmin = false;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -88,10 +92,18 @@ public class User {
         this.profilePictureType = profilePictureType;
     }
 
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+    }
+
     @Override
     public String toString() {
         return "User{id=" + id + ", username='" + username + "', email='" + email +
                 "', profilePicture=" + (profilePicture != null ? "present" : "null") +
-                ", profilePictureType='" + profilePictureType + "'}";
+                ", profilePictureType='" + profilePictureType + "', isAdmin=" + isAdmin + "}";
     }
 }

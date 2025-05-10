@@ -3,13 +3,13 @@ package com.fsd.sdp.project.model;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
-@Table(name = "`groups`", schema = "public") // Optionally specify schema; adjust if needed
+@Table(name = "`groups`", schema = "public")
 public class Group {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
 
@@ -22,21 +22,23 @@ public class Group {
 
     // Constructors
     public Group() {
+        this.id = UUID.randomUUID().toString();
         this.usernames = new ArrayList<>();
     }
 
     public Group(String name, String password, List<String> usernames) {
+        this.id = UUID.randomUUID().toString();
         this.name = name;
         this.password = password;
         this.usernames = (usernames != null) ? usernames : new ArrayList<>();
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -66,6 +68,6 @@ public class Group {
 
     @Override
     public String toString() {
-        return "Group{id=" + id + ", name='" + name + "', usernames=" + usernames + "}";
+        return "Group{id='" + id + "', name='" + name + "', usernames=" + usernames + "}";
     }
 }

@@ -5,7 +5,7 @@ public class FileDTO {
     private String fileName;
     private String fileType;
     private boolean isFavourite;
-    private String groupName; // Added to store the group name
+    private String groupName;
 
     // Default constructor
     public FileDTO() {}

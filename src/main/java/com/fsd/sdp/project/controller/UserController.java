@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -93,7 +93,7 @@ public class UserController {
             @PathVariable int userId,
             @RequestParam("profilePicture") MultipartFile profilePicture) {
         try {
-            if (profilePicture.getSize() > 5 * 1024 * 1024) { // 5MB limit
+            if (profilePicture.getSize() > 5 * 1024 * 1024) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                         .body("Profile picture must be less than 5MB");
             }
@@ -121,10 +121,27 @@ public class UserController {
 
         String contentType = user.getProfilePictureType() != null
                 ? user.getProfilePictureType()
-                : MediaType.IMAGE_JPEG_VALUE; // Fallback to JPEG if type not set
+                : MediaType.IMAGE_JPEG_VALUE;
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .body(user.getProfilePicture());
+    }
+
+    @DeleteMapping("/admin/delete/{adminId}/{userId}")
+    public ResponseEntity<String> deleteUserByAdmin(@PathVariable int adminId, @PathVariable int userId) {
+        try {
+            String result = userService.deleteUser(adminId, userId);
+            return ResponseEntity.ok(result);
+        } catch (RuntimeException e) {
+            if (e.getMessage().equals("Unauthorized: Only admins can delete users")) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+            } else if (e.getMessage().equals("User not found") || e.getMessage().equals("Admin not found")) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("An error occurred while deleting the user");
+            }
+        }
     }
 }

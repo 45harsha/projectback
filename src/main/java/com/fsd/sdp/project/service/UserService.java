@@ -20,4 +20,5 @@ public interface UserService {
     boolean emailExists(String email);
     String updateProfilePicture(int userId, MultipartFile profilePicture);
     byte[] getProfilePicture(int userId);
+    String deleteUser(int adminId, int userId);
 }

@@ -1,17 +1,16 @@
 package com.fsd.sdp.project.service;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.fsd.sdp.project.model.FileDTO;
 import com.fsd.sdp.project.model.User;
 import com.fsd.sdp.project.repository.FileRepository;
 import com.fsd.sdp.project.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,6 +39,7 @@ public class UserServiceImpl implements UserService {
                     user.setUsername(u.getUsername());
                     user.setEmail(u.getEmail());
                     user.setPassword(u.getPassword());
+                    user.setAdmin(u.isAdmin());
                     userRepository.save(user);
                     return "Updated Successfully";
                 })
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService {
                 .map(user -> {
                     try {
                         user.setProfilePicture(profilePicture.getBytes());
-                        user.setProfilePictureType(profilePicture.getContentType()); // Store MIME type
+                        user.setProfilePictureType(profilePicture.getContentType());
                         userRepository.save(user);
                         return "Profile picture updated successfully";
                     } catch (IOException e) {
@@ -142,5 +142,22 @@ public class UserServiceImpl implements UserService {
         return userRepository.findById(userId)
                 .map(User::getProfilePicture)
                 .orElse(null);
+    }
+
+    @Override
+    public String deleteUser(int adminId, int userId) {
+        return userRepository.findById(adminId)
+                .map(admin -> {
+                    if (!admin.isAdmin()) {
+                        throw new RuntimeException("Unauthorized: Only admins can delete users");
+                    }
+                    return userRepository.findById(userId)
+                            .map(user -> {
+                                userRepository.delete(user);
+                                return "User deleted successfully";
+                            })
+                            .orElse("User not found");
+                })
+                .orElse("Admin not found");
     }
 }

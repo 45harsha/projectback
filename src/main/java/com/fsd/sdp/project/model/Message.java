@@ -10,7 +10,8 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long groupId;
+    @Column(name = "group_id")
+    private String groupId; // Changed from Long to String
 
     private String senderUsername;
 
@@ -23,10 +24,10 @@ public class Message {
 
     // Constructors
     public Message() {
-        this.timestamp = new Date(); // Default timestamp
+        this.timestamp = new Date();
     }
 
-    public Message(Long groupId, String senderUsername, String content, String type, Date timestamp) {
+    public Message(String groupId, String senderUsername, String content, String type, Date timestamp) {
         this.groupId = groupId;
         this.senderUsername = senderUsername;
         this.content = content;
@@ -43,11 +44,11 @@ public class Message {
         this.id = id;
     }
 
-    public Long getGroupId() {
+    public String getGroupId() {
         return groupId;
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
@@ -85,6 +86,6 @@ public class Message {
 
     @Override
     public String toString() {
-        return "Message{id=" + id + ", groupId=" + groupId + ", senderUsername='" + senderUsername + "', content='" + content + "', type='" + type + "', timestamp=" + timestamp + "}";
+        return "Message{id=" + id + ", groupId='" + groupId + "', senderUsername='" + senderUsername + "', content='" + content + "', type='" + type + "', timestamp=" + timestamp + "}";
     }
 }
