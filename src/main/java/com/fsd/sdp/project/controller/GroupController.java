@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "https://reactfrontend-orcin.vercel.app", allowCredentials = "true")
+@CrossOrigin(origins = "https://reactfrontend-5rrvwa2vn-avinashs-projects-f6f8096c.vercel.app/", allowCredentials = "true")
 @RestController
 @RequestMapping("/api/groups")
 public class GroupController {
