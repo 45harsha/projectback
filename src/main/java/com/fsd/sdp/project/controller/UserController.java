@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin("https://reactfrontend-orcin.vercel.app/")
+@CrossOrigin("https://reactfrontend-5rrvwa2vn-avinashs-projects-f6f8096c.vercel.app/")
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
