@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = "https://reactfrontend-orcin.vercel.app", allowCredentials = "false")
+@CrossOrigin(origins = "https://reactfrontend-5rrvwa2vn-avinashs-projects-f6f8096c.vercel.app/", allowCredentials = "false")
 @RestController
 @RequestMapping("/api/sessions")
 public class SessionController {
