@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 
-@CrossOrigin(origins="https://reactfrontend-5rrvwa2vn-avinashs-projects-f6f8096c.vercel.app/")
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
