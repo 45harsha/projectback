@@ -12,5 +12,18 @@ public class ProjectApplication {
 		SpringApplication.run(ProjectApplication.class, args);
 		System.out.println("Project is running");
 	}
+	@Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                // Allow all paths starting with /api
+                registry.addMapping("/api/**")
+                        .allowedOrigins("https://reactfrontend-orcin.vercel.app")  // Frontend URL
+                        .allowedMethods("GET", "POST", "PUT", "DELETE")  // Allowed HTTP methods
+                        .allowCredentials(true);  // Allow cookies and credentials
+            }
+        };
+    }
 
 }
