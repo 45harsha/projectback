@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Long> {
-    List<Message> findByGroupId(String groupId); // Changed from Long to String
+    List<Message> findByGroupId(String groupId); 
 }
