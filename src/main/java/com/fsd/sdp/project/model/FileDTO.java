@@ -7,10 +7,10 @@ public class FileDTO {
     private boolean isFavourite;
     private String groupName;
 
-    // Default constructor
+    
     public FileDTO() {}
 
-    // Constructor for FileEntity (used in FileServiceImpl and UserServiceImpl)
+    
     public FileDTO(FileEntity fileEntity) {
         this.id = fileEntity.getId();
         this.fileName = fileEntity.getFileName();
@@ -18,15 +18,15 @@ public class FileDTO {
         this.isFavourite = fileEntity.getIsFavourite();
     }
 
-    // Constructor for getSharedFiles (long id, String fileName, String groupName)
+    
     public FileDTO(long id, String fileName, String groupName) {
         this.id = id;
         this.fileName = fileName;
         this.groupName = groupName;
-        this.isFavourite = false; // Default value
+        this.isFavourite = false; 
     }
 
-    // Getters and Setters
+    
     public Long getId() {
         return id;
     }
