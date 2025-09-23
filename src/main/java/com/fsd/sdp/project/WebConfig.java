@@ -12,20 +12,20 @@ public class WebConfig implements WebMvcConfigurer {
         // API endpoints
         registry.addMapping("/api/**")
                 .allowedOrigins(
-                    "http://localhost:8084",                 // local frontend dev
-                    "http://frontend:80",                    // docker frontend container
-                    "https://reactfrontend-orcin.vercel.app" // production
+                        "http://localhost:8084",
+                        "http://localhost:3000",
+                        "https://reactfrontend-orcin.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
 
-        // WebSocket endpoints
+        // WebSocket endpoint fallback (if needed)
         registry.addMapping("/ws/**")
                 .allowedOrigins(
-                    "http://localhost:8084",
-                    "http://frontend:80",
-                    "https://reactfrontend-orcin.vercel.app"
+                        "http://localhost:8084",
+                        "http://localhost:3000",
+                        "https://reactfrontend-orcin.vercel.app"
                 )
                 .allowedMethods("GET", "POST", "OPTIONS")
                 .allowedHeaders("*")
