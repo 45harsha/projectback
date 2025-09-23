@@ -10,8 +10,22 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:8084", "http://localhost:3000", "https://reactfrontend-orcin.vercel.app")
+                .allowedOrigins(
+                    "http://localhost:8084",
+                    "http://frontend:80",
+                    "https://reactfrontend-orcin.vercel.app"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+
+        registry.addMapping("/ws/**")
+                .allowedOrigins(
+                    "http://localhost:8084",
+                    "http://frontend:80",
+                    "https://reactfrontend-orcin.vercel.app"
+                )
+                .allowedMethods("GET", "POST", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
