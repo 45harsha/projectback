@@ -15,8 +15,9 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 // Allow all API requests from your frontend
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:8084")  // React frontend URL
+                        .allowedOrigins("http://localhost:8084", "https://reactfrontend-orcin.vercel.app") // dev + production
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                        .allowedHeaders("*")
                         .allowCredentials(true);
             }
         };
