@@ -1,31 +1,30 @@
 package com.fsd.sdp.project;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
+import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
+import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Configuration
-public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
-                .allowedOrigins(
-                    "http://localhost:8084",    // host dev
-                    "http://frontend:80",       // docker frontend container
-                    "https://reactfrontend-orcin.vercel.app"
-                )
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+@EnableWebSocket
+public class WebSocketConfig implements WebSocketConfigurer {
 
-        registry.addMapping("/ws/**")
-                .allowedOrigins(
-                    "http://localhost:8084",
-                    "http://frontend:80",
-                    "https://reactfrontend-orcin.vercel.app"
+    private final MyWebSocketHandler myWebSocketHandler;
+
+    public WebSocketConfig(MyWebSocketHandler myWebSocketHandler) {
+        this.myWebSocketHandler = myWebSocketHandler;
+    }
+
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(myWebSocketHandler, "/ws")
+                .addInterceptors(new HttpSessionHandshakeInterceptor())
+                .setAllowedOrigins(
+                    "http://localhost:8084",       // local dev
+                    "http://frontend:80",          // docker frontend
+                    "https://reactfrontend-orcin.vercel.app" // production
                 )
-                .allowedMethods("GET", "POST", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+                .withSockJS(); // keep SockJS if you use it in frontend
     }
 }
