@@ -6,20 +6,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // Allow API requests
-        registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:8084")  
+        registry.addMapping("/**")  // Allow all paths
+                .allowedOrigins("http://localhost:8084")  // Frontend URL
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-
-        // Allow WebSocket connections
-        registry.addMapping("/ws/**")
-                .allowedOrigins("http://localhost:8084")
-                .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
