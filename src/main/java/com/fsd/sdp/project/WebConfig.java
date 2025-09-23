@@ -6,15 +6,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         // API endpoints
         registry.addMapping("/api/**")
                 .allowedOrigins(
-                    "http://localhost:8084",
-                    "http://frontend:80",
-                    "https://reactfrontend-orcin.vercel.app",
-                    "http://localhost:3000"
+                    "http://localhost:8084",                 // local frontend dev
+                    "http://frontend:80",                    // docker frontend container
+                    "https://reactfrontend-orcin.vercel.app" // production
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
