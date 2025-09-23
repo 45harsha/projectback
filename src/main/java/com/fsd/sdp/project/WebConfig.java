@@ -8,12 +8,26 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        // API endpoints
         registry.addMapping("/api/**")
                 .allowedOrigins(
-                    "https://reactfrontend-orcin.vercel.app", 
-                    "http://localhost:8084"
+                    "http://localhost:8084",
+                    "http://frontend:80",
+                    "https://reactfrontend-orcin.vercel.app",
+                    "http://localhost:3000"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+
+        // WebSocket endpoints
+        registry.addMapping("/ws/**")
+                .allowedOrigins(
+                    "http://localhost:8084",
+                    "http://frontend:80",
+                    "https://reactfrontend-orcin.vercel.app"
+                )
+                .allowedMethods("GET", "POST", "OPTIONS")
                 .allowedHeaders("*")
                 .allowCredentials(true);
     }
