@@ -1,24 +1,26 @@
-package com.fsd.sdp.project.config;
+package com.fsd.sdp.project;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                // Allow all API requests from your frontend
-                registry.addMapping("/**")  // apply to all endpoints
-                        .allowedOrigins("http://localhost:8084")  // React frontend
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowCredentials(true);
-            }
-        };
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        // Allow API requests
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:8084")  
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+
+        // Allow WebSocket connections
+        registry.addMapping("/ws/**")
+                .allowedOrigins("http://localhost:8084")
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
