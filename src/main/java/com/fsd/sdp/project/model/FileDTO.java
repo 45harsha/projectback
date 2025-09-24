@@ -72,3 +72,4 @@ public class FileDTO {
         return "FileDTO{id=" + id + ", fileName='" + fileName + "', fileType='" + fileType + "', isFavourite=" + isFavourite + ", groupName='" + groupName + "'}";
     }
 }
+
