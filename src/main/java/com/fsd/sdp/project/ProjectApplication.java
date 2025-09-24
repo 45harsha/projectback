@@ -12,4 +12,5 @@ public class ProjectApplication {
         SpringApplication.run(ProjectApplication.class, args);
         System.out.println("Project is running");
     }
+
 }
