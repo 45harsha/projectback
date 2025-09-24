@@ -1,63 +1,73 @@
 package com.fsd.sdp.project.controller;
 
 import com.fsd.sdp.project.model.FileEntity;
+import com.fsd.sdp.project.model.Session;
 import com.fsd.sdp.project.service.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
+@CrossOrigin(origins = "http://localhost:5174", allowCredentials = "false")
 @RestController
 @RequestMapping("/api/sessions")
-@CrossOrigin(origins = {
-        "http://localhost:8084",
-        "http://localhost:3000",
-        "https://reactfrontend-orcin.vercel.app"
-}, allowedHeaders = "*", allowCredentials = "true")
 public class SessionController {
-
     @Autowired
     private SessionService sessionService;
 
-    // Upload a file to a session
-    @PostMapping("/upload/{sessionId}/{userId}")
-    public ResponseEntity<?> uploadSession(
-            @PathVariable String sessionId,
-            @PathVariable int userId,
-            @RequestParam("file") MultipartFile file) {
+    @PostMapping("/create")
+    public ResponseEntity<?> createSession(@RequestBody SessionRequest request) {
         try {
-            FileEntity uploadedFile = sessionService.uploadFile(userId, sessionId, file);
-            return ResponseEntity.ok(uploadedFile);
-        } catch (IOException e) {
-            return ResponseEntity.status(400).body("Upload failed: " + e.getMessage());
+            Session session = sessionService.createSession(request.getPasskey(), request.getUsername());
+            return ResponseEntity.ok(session);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    // Get all files in a session
-    @GetMapping("/{sessionId}/files")
-    public ResponseEntity<List<FileEntity>> getSessionFiles(@PathVariable String sessionId) {
-        List<FileEntity> files = sessionService.getSessionFiles(sessionId);
-        return ResponseEntity.ok(files);
-    }
-
-    // Create a new session
-    @PostMapping("/create")
-    public ResponseEntity<Session> createSession(
-            @RequestParam String passkey,
-            @RequestParam String creatorUsername) {
-        Session session = sessionService.createSession(passkey, creatorUsername);
-        return ResponseEntity.ok(session);
-    }
-
-    // Join an existing session
     @PostMapping("/join")
-    public ResponseEntity<Session> joinSession(
-            @RequestParam String passkey,
-            @RequestParam String username) {
-        Session session = sessionService.joinSession(passkey, username);
-        return ResponseEntity.ok(session);
+    public ResponseEntity<?> joinSession(@RequestBody SessionRequest request) {
+        try {
+            Session session = sessionService.joinSession(request.getPasskey(), request.getUsername());
+            return ResponseEntity.ok(session);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
+
+    @PostMapping("/upload/{passkey}/{userId}")
+    public ResponseEntity<?> uploadFile(
+            @PathVariable String passkey,
+            @PathVariable int userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file);
+            return ResponseEntity.ok("File uploaded: " + fileEntity.getFileName());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/files/{passkey}")
+    public ResponseEntity<?> getSessionFiles(@PathVariable String passkey) {
+        try {
+            List<FileEntity> files = sessionService.getSessionFiles(passkey);
+            return ResponseEntity.ok(files);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+}
+
+class SessionRequest {
+    private String passkey;
+    private String username;
+
+    public String getPasskey() { return passkey; }
+    public void setPasskey(String passkey) { this.passkey = passkey; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 }
