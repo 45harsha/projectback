@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/sessions")
 public class SessionController {
+
     @Autowired
     private SessionService sessionService;
 
@@ -45,7 +46,7 @@ public class SessionController {
             @PathVariable int userId,
             @RequestParam("file") MultipartFile file) {
         try {
-            FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file);
+            FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file); // matches service method
             return ResponseEntity.ok("File uploaded: " + fileEntity.getFileName());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -63,7 +64,7 @@ public class SessionController {
     }
 }
 
-// Request DTO
+// DTO for request payloads
 class SessionRequest {
     private String passkey;
     private String username;
