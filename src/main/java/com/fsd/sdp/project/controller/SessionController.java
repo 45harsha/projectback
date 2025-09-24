@@ -38,6 +38,7 @@ public class SessionController {
         }
     }
 
+    // ✅ Corrected upload method
     @PostMapping("/upload/{passkey}/{userId}")
     public ResponseEntity<?> uploadFile(
             @PathVariable String passkey,
@@ -62,6 +63,7 @@ public class SessionController {
     }
 }
 
+// Request DTO
 class SessionRequest {
     private String passkey;
     private String username;
