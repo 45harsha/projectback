@@ -11,24 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:5174", allowCredentials = "false")
-@RestController
-@RequestMapping("/api/sessions")
-public class SessionController {
-package com.fsd.sdp.project.controller;
-
-import com.fsd.sdp.project.model.FileEntity;
-import com.fsd.sdp.project.model.Session;
-import com.fsd.sdp.project.service.SessionService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
-
-@CrossOrigin(origins = "http://localhost:5174", allowCredentials = "false")
+@CrossOrigin(origins = {
+        "http://localhost:5174",
+        "http://localhost:3000",
+        "https://reactfrontend-orcin.vercel.app"
+}, allowCredentials = "true")
 @RestController
 @RequestMapping("/api/sessions")
 public class SessionController {
@@ -65,7 +52,6 @@ public class SessionController {
             @PathVariable int userId,
             @RequestParam("file") MultipartFile file) {
         try {
-            // Correct method call
             FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file);
             return ResponseEntity.ok("File uploaded: " + fileEntity.getFileName());
         } catch (Exception e) {
@@ -73,7 +59,7 @@ public class SessionController {
         }
     }
 
-    // Get all files of a session
+    // Get all files in a session
     @GetMapping("/files/{passkey}")
     public ResponseEntity<?> getSessionFiles(@PathVariable String passkey) {
         try {
@@ -85,72 +71,14 @@ public class SessionController {
     }
 }
 
-// DTO for requests
+// DTO for session requests
 class SessionRequest {
     private String passkey;
     private String username;
 
     public String getPasskey() { return passkey; }
     public void setPasskey(String passkey) { this.passkey = passkey; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-}
 
-    @Autowired
-    private SessionService sessionService;
-
-    @PostMapping("/create")
-    public ResponseEntity<?> createSession(@RequestBody SessionRequest request) {
-        try {
-            Session session = sessionService.createSession(request.getPasskey(), request.getUsername());
-            return ResponseEntity.ok(session);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @PostMapping("/join")
-    public ResponseEntity<?> joinSession(@RequestBody SessionRequest request) {
-        try {
-            Session session = sessionService.joinSession(request.getPasskey(), request.getUsername());
-            return ResponseEntity.ok(session);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    // ✅ Corrected upload method
-    @PostMapping("/upload/{passkey}/{userId}")
-    public ResponseEntity<?> uploadFile(
-            @PathVariable String passkey,
-            @PathVariable int userId,
-            @RequestParam("file") MultipartFile file) {
-        try {
-            FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file); // matches service method
-            return ResponseEntity.ok("File uploaded: " + fileEntity.getFileName());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/files/{passkey}")
-    public ResponseEntity<?> getSessionFiles(@PathVariable String passkey) {
-        try {
-            List<FileEntity> files = sessionService.getSessionFiles(passkey);
-            return ResponseEntity.ok(files);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-    }
-}
-
-// DTO for request payloads
-class SessionRequest {
-    private String passkey;
-    private String username;
-
-    public String getPasskey() { return passkey; }
-    public void setPasskey(String passkey) { this.passkey = passkey; }
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 }
