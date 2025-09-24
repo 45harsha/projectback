@@ -11,11 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-@CrossOrigin(origins = {
-        "http://localhost:5174",
-        "http://localhost:3000",
-        "https://reactfrontend-orcin.vercel.app"
-}, allowCredentials = "true")
+@CrossOrigin(origins = "http://localhost:5174", allowCredentials = "false")
 @RestController
 @RequestMapping("/api/sessions")
 public class SessionController {
@@ -23,7 +19,6 @@ public class SessionController {
     @Autowired
     private SessionService sessionService;
 
-    // Create a new session
     @PostMapping("/create")
     public ResponseEntity<?> createSession(@RequestBody SessionRequest request) {
         try {
@@ -34,7 +29,6 @@ public class SessionController {
         }
     }
 
-    // Join an existing session
     @PostMapping("/join")
     public ResponseEntity<?> joinSession(@RequestBody SessionRequest request) {
         try {
@@ -45,13 +39,13 @@ public class SessionController {
         }
     }
 
-    // Upload a file to a session
     @PostMapping("/upload/{passkey}/{userId}")
     public ResponseEntity<?> uploadFile(
             @PathVariable String passkey,
             @PathVariable int userId,
             @RequestParam("file") MultipartFile file) {
         try {
+            // ✅ Correct method from SessionService
             FileEntity fileEntity = sessionService.uploadFile(userId, passkey, file);
             return ResponseEntity.ok("File uploaded: " + fileEntity.getFileName());
         } catch (Exception e) {
@@ -59,7 +53,6 @@ public class SessionController {
         }
     }
 
-    // Get all files in a session
     @GetMapping("/files/{passkey}")
     public ResponseEntity<?> getSessionFiles(@PathVariable String passkey) {
         try {
@@ -71,14 +64,13 @@ public class SessionController {
     }
 }
 
-// DTO for session requests
+// DTO for requests
 class SessionRequest {
     private String passkey;
     private String username;
 
     public String getPasskey() { return passkey; }
     public void setPasskey(String passkey) { this.passkey = passkey; }
-
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 }
